@@ -40,7 +40,7 @@ fun generateImage(borderWidth: Int = 3): BufferedImage =
                         grid.positionedChars().forEach {
                             val (position, char) = it
                             val (x, y) = position
-                            drawString(char.toString(), x + borderWidth, y + borderWidth)
+                            drawString(char.toString(), x + borderWidth, y + CHAR_SIZE_PIXELS)
                         }
                     }
                 }

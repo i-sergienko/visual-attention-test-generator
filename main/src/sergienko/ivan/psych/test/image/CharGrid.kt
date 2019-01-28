@@ -12,29 +12,49 @@ class CharGrid(
     private val gridMap: MutableMap<Position, PositionedChar> = HashMap()
 
     init {
-        val gridWidth = (widthPixels / (characterSizePixels)) / 2
+        val gridWidth = (widthPixels / (characterSizePixels)) / 2 - 4
         val gridHeight = (heightPixels / (characterSizePixels)) / 2
         val slotWidth = widthPixels / gridWidth
 
         println("Grid width: $gridWidth, grid height: $gridHeight")
 
-        populateDistractors(
-                gridWidth,
-                gridHeight,
-                slotWidth
-        )
+        populateSymbols(gridWidth, gridHeight, slotWidth)
+//        populateDistractors(
+//                gridWidth,
+//                gridHeight,
+//                slotWidth
+//        )
     }
 
     private fun populateSymbols(
             gridWidth: Int,
             gridHeight: Int,
-            slotWidth: Int,
-            slotHeight: Int
+            slotWidth: Int
     ) {
         val random = Random()
-        (1..numSymbols)
+        (1..(numSymbols / 2))
                 .forEach {
+                    var (left, right) = generateSymbols(
+                            random,
+                            gridWidth,
+                            gridHeight,
+                            slotWidth
+                    )
 
+                    while (gridMap.contains(left.first) || gridMap.contains(left.second)) {
+                        val (currentLeft, currentRight) =  generateSymbols(
+                        random,
+                        gridWidth,
+                        gridHeight,
+                        slotWidth
+                        )
+
+                        left = currentLeft
+                        right = currentRight
+                    }
+
+                    gridMap[left.first] = right.first
+                    gridMap[left.second] = right.second
                 }
     }
 
@@ -72,21 +92,32 @@ class CharGrid(
                 }
     }
 
-//    private fun generateSymbols(
-//            random: Random,
-//            gridWidth: Int,
-//            gridHeight: Int,
-//            slotWidth: Int,
-//            slotHeight: Int
-//    ): Pair<Position, Pair<PositionedChar, PositionedChar>> {
-//        val positionInGrid = Position(random.nextInt(gridWidth), random.nextInt(gridHeight))
-//        val charPosition = Position(
-//                (positionInGrid.first * slotWidth), //+ leftOffset,
-//                (positionInGrid.second * slotHeight)// + topOffset
-//        )
-//
-//        return positionInGrid to PositionedChar(charPosition, 'A')
-//    }
+    private fun generateSymbols(
+            random: Random,
+            gridWidth: Int,
+            gridHeight: Int,
+            slotWidth: Int
+    ): Pair<Pair<Position, Position>, Pair<PositionedChar, PositionedChar>> {
+        val positionInGridLeft = Position(random.nextInt(gridWidth / 2 + 1) - 1, random.nextInt(gridHeight))
+        val positionInGridRight = positionInGridLeft.mirrored(gridWidth)
+        val leftDivisor = (random.nextInt(100)).toDouble() / 100.0
+        val leftOffset = (characterSizePixels * leftDivisor).toInt()
+        val topDivisor = (random.nextInt(100)).toDouble() / 100.0
+        val topOffset = (characterSizePixels * topDivisor).toInt()
+        val charPositionLeft = Position(
+                (positionInGridLeft.first * slotWidth) + leftOffset,
+                (positionInGridLeft.second * slotWidth) + topOffset
+        )
+        val charPositionRight = Position(
+                (positionInGridRight.first * slotWidth) - leftOffset,
+                (positionInGridRight.second * slotWidth) + topOffset
+        )
+
+        return Pair(positionInGridLeft, positionInGridRight) to
+                Pair(PositionedChar(charPositionLeft, 'A'), PositionedChar(charPositionRight, 'A'))
+    }
+
+    private fun Position.mirrored(gridWidth: Int) = Position(first = gridWidth - first, second = second)
 
     private fun generateDistractor(
             random: Random,
