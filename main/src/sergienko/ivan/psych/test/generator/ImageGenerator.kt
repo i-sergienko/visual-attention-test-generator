@@ -27,17 +27,51 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
 
             font = Font("Arial Black", Font.PLAIN, cmsToPixel(0.25, DPI.toDouble()).toInt())
 
-            var counter = 1
-            (0 until height step cellSize).forEach {
-                val currentY = it
-                (0 until width - cellSize step cellSize).forEach {
-                    val currentX = it
-//                    drawString(counter.toString(), currentX + cellSize/10, currentY + cellSize/3)
-                    val coordinates = randomizeCoordinatesWithinBounds(currentX, currentY, cellSize)
-                    drawString(distractors.get(random.nextInt(distractors.size)).toString(), coordinates.first, coordinates.second)
-                    counter++
+            val grid = Array(16) { Array(14) { ' ' } }
+
+            (0 until 30).forEach {
+                var x = random.nextInt(8)
+                var y = random.nextInt(14)
+
+                while (grid[x][y] == 'A') {
+                    x = random.nextInt(8)
+                    y = random.nextInt(14)
                 }
+
+                grid[x][y] = 'A'
+                grid[15 - x][y] = 'A'
+                val coordinates = randomizeCoordinatesWithinBounds(x * cellSize, y * cellSize, cellSize)
+
+                drawString(
+                    "A",
+                    coordinates.first,
+                    coordinates.second
+                )
+                drawString(
+                    "A",
+                    (15 - x)*cellSize + (cellSize - (coordinates.first - x*cellSize) - 6),
+                    coordinates.second
+                )
             }
+
+//            var xGrid = 0
+//            var yGrid = 0
+//            (0 until height step cellSize).forEach {
+//                val currentY = it
+//                (0 until width - cellSize step cellSize).forEach {
+//                    val currentX = it
+////                    drawString(counter.toString(), currentX + cellSize/10, currentY + cellSize/3)
+//                    val coordinates = randomizeCoordinatesWithinBounds(currentX, currentY, cellSize)
+//
+//                    drawString(
+//                        distractors.get(random.nextInt(distractors.size)).toString(),
+//                        coordinates.first,
+//                        coordinates.second
+//                    )
+//                    xGrid++
+//                }
+//                yGrid++
+//            }
         }
     }
 
@@ -45,17 +79,17 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
 }
 
 private fun randomizeCoordinatesWithinBounds(x: Int, y: Int, cellSize: Int): Pair<Int, Int> {
-    val newX = random.nextInt((cellSize/1.4).toInt()).let {
+    val newX = random.nextInt((cellSize / 1.4).toInt()).let {
         when {
-            x + it <= x + cellSize/10 -> x + cellSize/10
-            x + it >= (x + (cellSize/1.4)).toInt() -> (x + (cellSize/1.4)).toInt()
+            x + it <= x + cellSize / 10 -> x + cellSize / 10
+            x + it >= (x + (cellSize / 1.4)).toInt() -> (x + (cellSize / 1.4)).toInt()
             else -> x + it
         }
     }
-    val newY = random.nextInt((cellSize/1.1).toInt()).let {
+    val newY = random.nextInt((cellSize / 1.1).toInt()).let {
         when {
-            y + it <= y + cellSize/3 -> y + cellSize/3
-            y + it >= (y + cellSize/1.1).toInt() -> (y + cellSize/1.1).toInt()
+            y + it <= y + cellSize / 3 -> y + cellSize / 3
+            y + it >= (y + cellSize / 1.1).toInt() -> (y + cellSize / 1.1).toInt()
             else -> y + it
         }
     }
