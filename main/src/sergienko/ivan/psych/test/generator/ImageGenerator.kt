@@ -6,6 +6,9 @@ import java.awt.Color
 import java.awt.Font
 import java.awt.image.BufferedImage
 import java.awt.image.BufferedImage.TYPE_INT_RGB
+import java.util.*
+
+val random = Random()
 
 fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
     val image = BufferedImage(width, height, TYPE_INT_RGB).apply {
@@ -29,7 +32,9 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
                 val currentY = it
                 (0 until width - cellSize step cellSize).forEach {
                     val currentX = it
-                    drawString(counter.toString(), currentX + cellSize/4, currentY + cellSize/2)
+//                    drawString(counter.toString(), currentX + cellSize/10, currentY + cellSize/3)
+                    val coordinates = randomizeCoordinatesWithinBounds(currentX, currentY, cellSize)
+                    drawString(distractors.get(random.nextInt(distractors.size)).toString(), coordinates.first, coordinates.second)
                     counter++
                 }
             }
@@ -38,3 +43,24 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
 
     return image
 }
+
+private fun randomizeCoordinatesWithinBounds(x: Int, y: Int, cellSize: Int): Pair<Int, Int> {
+    val newX = random.nextInt((cellSize/1.4).toInt()).let {
+        when {
+            x + it <= x + cellSize/10 -> x + cellSize/10
+            x + it >= (x + (cellSize/1.4)).toInt() -> (x + (cellSize/1.4)).toInt()
+            else -> x + it
+        }
+    }
+    val newY = random.nextInt((cellSize/1.1).toInt()).let {
+        when {
+            y + it <= y + cellSize/3 -> y + cellSize/3
+            y + it >= (y + cellSize/1.1).toInt() -> (y + cellSize/1.1).toInt()
+            else -> y + it
+        }
+    }
+
+    return newX to newY
+}
+
+private val distractors = ('A'..'Z').toList()
