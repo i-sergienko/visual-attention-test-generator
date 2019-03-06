@@ -21,27 +21,41 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
             stroke = BasicStroke(1.0f)
             color = Color.BLACK
 
-            (0 until width step cellSize).forEach {
-                drawLine(it, 0, it, height)
-            }
+            drawLine(0, 0, width, 0)
+            drawLine(cellSize*16, 0, cellSize*16, cellSize*14)
+            drawLine(0, cellSize*14, cellSize*16, cellSize*14)
+            drawLine(0, 0, 0, cellSize*14)
 
-            (0 until height step cellSize).forEach {
-                drawLine(0, it, width, it)
-            }
+//            (0 until width step cellSize).forEach {
+//                drawLine(it, 0, it, height)
+//            }
+//
+//            (0 until height step cellSize).forEach {
+//                drawLine(0, it, width, it)
+//            }
 
             font = Font("Arial Black", Font.PLAIN, cmsToPixel(0.25, DPI.toDouble()).toInt())
 
             val grid = Array(16) { Array(14) { ' ' } }
 
 
-            color = Color.RED
+            color = Color.BLACK
 
             (0 until 30).forEach {
-                var x = random.nextInt(8)
+                var x = random.nextInt(7)
                 var y = random.nextInt(14)
 
-                while (grid[x][y] == 'A') {
-                    x = random.nextInt(8)
+                while (grid[x][y] == 'A' ||
+                    (x > 0 && grid[x - 1][y] == 'A') ||
+                    (x < 7 && grid[x + 1][y] == 'A') ||
+                    (y > 0 && grid[x][y - 1] == 'A') ||
+                    (y < 13 && grid[x][y + 1] == 'A') // ||
+//                    (x > 0 && y > 0 && grid[x - 1][y - 1] == 'A') ||
+//                    (x > 0 && y < 13 && grid[x - 1][y + 1] == 'A') ||
+//                    (x < 15 && y > 0 && grid[x + 1][y - 1] == 'A') ||
+//                    (x < 15 && y < 13 && grid[x + 1][y + 1] == 'A')
+                ) {
+                    x = random.nextInt(7)
                     y = random.nextInt(14)
                 }
 
@@ -112,4 +126,4 @@ private fun randomizeCoordinatesWithinBounds(x: Int, y: Int, cellSize: Int): Pai
     return newX to newY
 }
 
-private val distractors = ('A'..'Z').toList()
+private val distractors = ('B'..'Z').toList()

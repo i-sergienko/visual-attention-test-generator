@@ -2,6 +2,8 @@ package sergienko.ivan.psych.test
 
 import sergienko.ivan.psych.test.generator.cmsToPixel
 import sergienko.ivan.psych.test.generator.generate
+import sergienko.ivan.psych.test.pdf.A4_HEIGHT_PIXELS
+import sergienko.ivan.psych.test.pdf.toPDF
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.image.BufferedImage
@@ -16,7 +18,16 @@ const val HEIGHT = 10
 const val DPI = 100//72
 
 fun main(args: Array<String>) {
+//    val width = cmsToPixel(WIDTH.toDouble(), DPI.toDouble()).toInt() - 7
+//    val height = cmsToPixel(HEIGHT.toDouble(), DPI.toDouble()).toInt() + 14
+//
+//    val cellSize = cmsToPixel(0.75, DPI.toDouble()).toInt()
+//
+//    generate(width, height, cellSize).toPDF(
+//        path = "C:\\Users\\Ivan\\Pictures\\pdf\\some.pdf"
+//    )
     invokeLater { createAndShowGUI() }
+
 }
 
 private fun createAndShowGUI() {
@@ -25,11 +36,7 @@ private fun createAndShowGUI() {
 
     val cellSize = cmsToPixel(0.75, DPI.toDouble()).toInt()
 
-    val frame = ImageFrame(
-        width = width,
-        height = height,
-        image = generate(width, height, cellSize)
-    )
+    val frame = ImageFrame(image = generate(width, height, cellSize))
 
     //Display the window.
     frame.defaultCloseOperation = EXIT_ON_CLOSE
@@ -39,8 +46,6 @@ private fun createAndShowGUI() {
 }
 
 class ImageFrame(
-    width: Int,
-    height: Int,
     private val image: BufferedImage
 ) : JFrame() {
     init {
