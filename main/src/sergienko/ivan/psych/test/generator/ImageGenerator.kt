@@ -15,7 +15,11 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
         with(createGraphics()) {
             background = Color.WHITE
             color = Color.WHITE
+
+            fillRect(0, 0, width, height)
+
             stroke = BasicStroke(1.0f)
+            color = Color.BLACK
 
             (0 until width step cellSize).forEach {
                 drawLine(it, 0, it, height)
@@ -28,6 +32,9 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
             font = Font("Arial Black", Font.PLAIN, cmsToPixel(0.25, DPI.toDouble()).toInt())
 
             val grid = Array(16) { Array(14) { ' ' } }
+
+
+            color = Color.RED
 
             (0 until 30).forEach {
                 var x = random.nextInt(8)
@@ -54,24 +61,32 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
                 )
             }
 
-//            var xGrid = 0
-//            var yGrid = 0
-//            (0 until height step cellSize).forEach {
-//                val currentY = it
-//                (0 until width - cellSize step cellSize).forEach {
-//                    val currentX = it
-////                    drawString(counter.toString(), currentX + cellSize/10, currentY + cellSize/3)
-//                    val coordinates = randomizeCoordinatesWithinBounds(currentX, currentY, cellSize)
-//
-//                    drawString(
-//                        distractors.get(random.nextInt(distractors.size)).toString(),
-//                        coordinates.first,
-//                        coordinates.second
-//                    )
-//                    xGrid++
-//                }
-//                yGrid++
-//            }
+
+            color = Color.BLACK
+
+            var xGrid = 0
+            var yGrid = 0
+            (0 until height step cellSize).forEach {
+                val currentY = it
+
+                xGrid = 0
+                (0 until width - cellSize step cellSize).forEach {
+                    val currentX = it
+
+                    if (yGrid <= 13 && grid[xGrid][yGrid] != 'A') {
+                        val coordinates = randomizeCoordinatesWithinBounds(currentX, currentY, cellSize)
+
+                        drawString(
+                            distractors.get(random.nextInt(distractors.size)).toString(),
+                            coordinates.first,
+                            coordinates.second
+                        )
+                    }
+
+                    xGrid++
+                }
+                yGrid++
+            }
         }
     }
 
