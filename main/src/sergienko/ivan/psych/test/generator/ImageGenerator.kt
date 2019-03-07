@@ -10,36 +10,34 @@ import java.util.*
 
 val random = Random()
 
-fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
-    val image = BufferedImage(width, height, TYPE_INT_RGB).apply {
+fun generate(gridWidth: Int, gridHeight: Int, cellSize: Int): BufferedImage {
+    val image = BufferedImage(gridWidth*cellSize+1, gridHeight*cellSize+1, TYPE_INT_RGB).apply {
         with(createGraphics()) {
             background = Color.WHITE
             color = Color.WHITE
 
-            fillRect(0, 0, width, height)
+            fillRect(0, 0, gridWidth*cellSize+1, gridHeight*cellSize+1)
 
             stroke = BasicStroke(1.0f)
             color = Color.BLACK
 
-            drawLine(0, 0, width, 0)
-            drawLine(cellSize*16, 0, cellSize*16, cellSize*14)
-            drawLine(0, cellSize*14, cellSize*16, cellSize*14)
-            drawLine(0, 0, 0, cellSize*14)
+            font = Font("Arial Black", Font.PLAIN, cmsToPixel(0.15, DPI.toDouble()).toInt())
 
-//            (0 until width step cellSize).forEach {
-//                drawLine(it, 0, it, height)
-//            }
-//
-//            (0 until height step cellSize).forEach {
-//                drawLine(0, it, width, it)
-//            }
-
-            font = Font("Arial Black", Font.PLAIN, cmsToPixel(0.25, DPI.toDouble()).toInt())
-
-            val grid = Array(16) { Array(14) { ' ' } }
+            val grid = Array(gridWidth) { Array(gridHeight) { ' ' } }
 
 
             color = Color.BLACK
+
+//            var counter = 1
+//            (0..height step cellSize).forEach {
+//                val currentY = it
+//                (0..width - cellSize step cellSize).forEach {
+//                    val currentX = it
+////                    val coords = randomizeCoordinatesWithinBounds(currentX, currentY, cel)
+//                    drawString(counter.toString(), currentX + cellSize/4, currentY + cellSize/2)
+//                    counter++
+//                }
+//            }
 
             (0 until 30).forEach {
                 var x = random.nextInt(7)
@@ -80,11 +78,11 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
 
             var xGrid = 0
             var yGrid = 0
-            (0 until height step cellSize).forEach {
+            (0..height step cellSize).forEach {
                 val currentY = it
 
                 xGrid = 0
-                (0 until width - cellSize step cellSize).forEach {
+                (0..width - cellSize step cellSize).forEach {
                     val currentX = it
 
                     if (yGrid <= 13 && grid[xGrid][yGrid] != 'A') {
@@ -104,7 +102,23 @@ fun generate(width: Int, height: Int, cellSize: Int): BufferedImage {
         }
     }
 
-    return image
+    val imageInFrame = BufferedImage((gridWidth+2)*cellSize+1, (gridHeight+2)*cellSize+1, TYPE_INT_RGB)
+        .apply {
+            with(graphics) {
+                color = Color.WHITE
+                fillRect(0, 0, (gridWidth+2)*cellSize+1, (gridHeight+2)*cellSize+1)
+
+                color = Color.BLACK
+                drawLine(0, 0, width, 0)
+                drawLine(cellSize*(gridWidth+2), 0, cellSize*(gridWidth+2), cellSize*(gridHeight+2)*cellSize)
+                drawLine(0, (gridHeight+2)*cellSize, cellSize*(gridWidth+2), cellSize*(gridHeight+2))
+                drawLine(0, 0, 0, cellSize*(gridHeight+2))
+
+                graphics.drawImage(image, cellSize, cellSize, null)
+            }
+        }
+
+    return imageInFrame
 }
 
 private fun randomizeCoordinatesWithinBounds(x: Int, y: Int, cellSize: Int): Pair<Int, Int> {

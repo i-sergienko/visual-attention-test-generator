@@ -12,35 +12,29 @@ import javax.swing.JFrame
 import javax.swing.JFrame.EXIT_ON_CLOSE
 import javax.swing.SwingUtilities.invokeLater
 
-const val WIDTH = 12
-const val HEIGHT = 10
-
-const val DPI = 100//72
+const val DPI = 300//72
 
 fun main(args: Array<String>) {
-//    val width = cmsToPixel(WIDTH.toDouble(), DPI.toDouble()).toInt() - 7
-//    val height = cmsToPixel(HEIGHT.toDouble(), DPI.toDouble()).toInt() + 14
-//
-//    val cellSize = cmsToPixel(0.75, DPI.toDouble()).toInt()
-//
-//    generate(width, height, cellSize).toPDF(
-//        path = "C:\\Users\\Ivan\\Pictures\\pdf\\some.pdf"
-//    )
-    invokeLater { createAndShowGUI() }
+    val gridWidth = 16
+    val gridHeight = 14
+    val cellSize = cmsToPixel(0.75, DPI.toDouble()).toInt()
 
+    generate(gridWidth, gridHeight, cellSize).toPDF(
+        path = "C:\\Users\\Ivan\\Pictures\\pdf\\some.pdf"
+    )
+//    invokeLater { createAndShowGUI() }
 }
 
 private fun createAndShowGUI() {
-    val width = cmsToPixel(WIDTH.toDouble(), DPI.toDouble()).toInt() - 7
-    val height = cmsToPixel(HEIGHT.toDouble(), DPI.toDouble()).toInt() + 14
-
+    val gridWidth = 16
+    val gridHeight = 14
     val cellSize = cmsToPixel(0.75, DPI.toDouble()).toInt()
 
-    val frame = ImageFrame(image = generate(width, height, cellSize))
+    val frame = ImageFrame(image = generate(gridWidth, gridHeight, cellSize))
 
     //Display the window.
     frame.defaultCloseOperation = EXIT_ON_CLOSE
-    frame.setSize(width, height)
+    frame.setSize(gridWidth*cellSize, gridHeight*cellSize)
     frame.repaint()
     frame.isVisible = true
 }
@@ -55,6 +49,6 @@ class ImageFrame(
     }
 
     override fun paint(g: Graphics) {
-        g.drawImage(image, image.width / 4, image.height/4, null)
+        g.drawImage(image, width/2 - image.width / 2, height/2-image.height/2, null)
     }
 }
