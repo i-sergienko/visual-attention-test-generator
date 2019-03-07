@@ -15,9 +15,9 @@ import javax.swing.SwingUtilities.invokeLater
 const val DPI = 300//72
 
 fun main(args: Array<String>) {
-    val gridWidth = 16
-    val gridHeight = 14
-    val cellSize = cmsToPixel(0.75, DPI.toDouble()).toInt()
+    val gridWidth = 24
+    val gridHeight = 21
+    val cellSize = cmsToPixel(0.5, DPI.toDouble()).toInt()
 
     generate(gridWidth, gridHeight, cellSize).toPDF(
         path = "C:\\Users\\Ivan\\Pictures\\pdf\\some.pdf"
@@ -26,9 +26,9 @@ fun main(args: Array<String>) {
 }
 
 private fun createAndShowGUI() {
-    val gridWidth = 16
-    val gridHeight = 14
-    val cellSize = cmsToPixel(0.75, DPI.toDouble()).toInt()
+    val gridWidth = 24
+    val gridHeight = 21
+    val cellSize = cmsToPixel(0.5, DPI.toDouble()).toInt()
 
     val frame = ImageFrame(image = generate(gridWidth, gridHeight, cellSize))
 
