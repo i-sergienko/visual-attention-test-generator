@@ -21,19 +21,18 @@ fun generate(gridWidth: Int, gridHeight: Int, cellSize: Int): BufferedImage {
             stroke = BasicStroke(1.0f)
 
             color = Color.BLACK
-//
-//            (0 until width step cellSize).forEach {
-//                drawLine(it, 0, it, height)
-//            }
-//
-//            (0 until height step cellSize).forEach {
-//                drawLine(0, it, width, it)
-//            }
 
-            font = Font("Arial Black", Font.PLAIN, cmsToPixel(0.20, DPI.toDouble()).toInt())
+            (0 until width step cellSize).forEach {
+                drawLine(it, 0, it, height)
+            }
+
+            (0 until height step cellSize).forEach {
+                drawLine(0, it, width, it)
+            }
+
+            font = Font("Arial", Font.PLAIN, cmsToPixel(0.24, DPI.toDouble()).toInt())
 
             val grid = Array(gridWidth) { Array(gridHeight) { ' ' } }
-
 
 //            color = Color.RED
 
@@ -74,7 +73,7 @@ fun generate(gridWidth: Int, gridHeight: Int, cellSize: Int): BufferedImage {
 
             color = Color.BLACK
 
-            (1..257).forEach {
+            (1..314).forEach {
                 var x = random.nextInt(gridWidth)
                 var y = random.nextInt(gridHeight)
 
@@ -97,24 +96,24 @@ fun generate(gridWidth: Int, gridHeight: Int, cellSize: Int): BufferedImage {
         }
     }
 
-    val imageInFrame = BufferedImage((gridWidth + 2) * cellSize + 1, (gridHeight + 2) * cellSize + 1, TYPE_INT_RGB)
+    val imageInFrame = BufferedImage((gridWidth + 1) * cellSize + 1, (gridHeight + 1) * cellSize + 1, TYPE_INT_RGB)
         .apply {
             with(graphics) {
                 color = Color.WHITE
-                fillRect(0, 0, (gridWidth + 2) * cellSize + 1, (gridHeight + 2) * cellSize + 1)
+                fillRect(0, 0, (gridWidth + 1) * cellSize + 1, (gridHeight + 1) * cellSize + 1)
 
                 color = Color.BLACK
                 drawLine(0, 0, width, 0)
                 drawLine(
-                    cellSize * (gridWidth + 2),
+                    cellSize * (gridWidth + 1),
                     0,
-                    cellSize * (gridWidth + 2),
-                    cellSize * (gridHeight + 2) * cellSize
+                    cellSize * (gridWidth + 1),
+                    cellSize * (gridHeight + 1) * cellSize
                 )
-                drawLine(0, (gridHeight + 2) * cellSize, cellSize * (gridWidth + 2), cellSize * (gridHeight + 2))
-                drawLine(0, 0, 0, cellSize * (gridHeight + 2))
+                drawLine(0, (gridHeight + 1) * cellSize, cellSize * (gridWidth + 1), cellSize * (gridHeight + 1))
+                drawLine(0, 0, 0, cellSize * (gridHeight + 1))
 
-                graphics.drawImage(image, cellSize, cellSize, null)
+                graphics.drawImage(image, cellSize/2, cellSize/2, null)
             }
         }
 
