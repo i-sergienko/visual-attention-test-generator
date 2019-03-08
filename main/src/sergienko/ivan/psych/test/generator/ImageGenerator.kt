@@ -4,6 +4,7 @@ import sergienko.ivan.psych.test.DPI
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
+import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import java.awt.image.BufferedImage.TYPE_INT_RGB
 import java.util.*
@@ -11,91 +12,141 @@ import java.util.*
 val random = Random()
 
 fun generate(gridWidth: Int, gridHeight: Int, cellSize: Int): BufferedImage {
+    val symbolTable = fillSymbolTable(gridWidth, gridHeight, cellSize)
+
+    return symbolTable.toImage(
+        gridWidth = gridWidth,
+        gridHeight = gridHeight,
+        cellSize = cellSize,
+        drawGrid = true,
+        coloredA = true
+    )
+}
+
+private fun Array<Array<Pair<Char, Coordinates>>>.toImage(
+    gridWidth: Int,
+    gridHeight: Int,
+    cellSize: Int,
+    drawGrid: Boolean = false,
+    coloredA: Boolean = false,
+    frame: Boolean = true
+): BufferedImage {
+    val table = this
     val image = BufferedImage(gridWidth * cellSize + 1, gridHeight * cellSize + 1, TYPE_INT_RGB).apply {
+        val img = this
         with(createGraphics()) {
             background = Color.WHITE
             color = Color.WHITE
 
             fillRect(0, 0, gridWidth * cellSize + 1, gridHeight * cellSize + 1)
 
-            stroke = BasicStroke(1.0f)
-
-            color = Color.BLACK
-
-            (0 until width step cellSize).forEach {
-                drawLine(it, 0, it, height)
+            if (drawGrid) {
+                drawGrid(img, cellSize)
             }
-
-            (0 until height step cellSize).forEach {
-                drawLine(0, it, width, it)
-            }
-
-            font = Font("Arial", Font.PLAIN, cmsToPixel(0.24, DPI.toDouble()).toInt())
-
-            val grid = Array(gridWidth) { Array(gridHeight) { ' ' } }
-
-//            color = Color.RED
-
-            (0 until 30).forEach {
-                var x = random.nextInt(gridWidth / 2 - 1)
-                var y = random.nextInt(gridHeight / 2)
-
-                while (grid[x][y] == 'A' ||
-                    (x > 0 && grid[x - 1][y] == 'A') ||
-                    (x < gridWidth / 2 - 1 && grid[x + 1][y] == 'A') ||
-                    (y > 0 && grid[x][y - 1] == 'A') ||
-                    (y < gridHeight - 1 && grid[x][y + 1] == 'A') ||
-                    (x > 0 && y > 0 && grid[x - 1][y - 1] == 'A') ||
-                    (x > 0 && y < 13 && grid[x - 1][y + 1] == 'A') ||
-                    (x < 15 && y > 0 && grid[x + 1][y - 1] == 'A') ||
-                    (x < 15 && y < 13 && grid[x + 1][y + 1] == 'A')
-                ) {
-                    x = random.nextInt(gridWidth / 2 - 1)
-                    y = random.nextInt(gridHeight)
-                }
-
-                grid[x][y] = 'A'
-                grid[(gridWidth - 1) - x][y] = 'A'
-                val coordinates = randomizeCoordinatesWithinBounds(x * cellSize, y * cellSize, cellSize)
-
-                drawString(
-                    "A",
-                    coordinates.first,
-                    coordinates.second
-                )
-                drawString(
-                    "A",
-                    ((gridWidth - 1) - x) * cellSize + (cellSize - (coordinates.first - x * cellSize) - 6),
-                    coordinates.second
-                )
-            }
-
-
-            color = Color.BLACK
-
-            (1..314).forEach {
-                var x = random.nextInt(gridWidth)
-                var y = random.nextInt(gridHeight)
-
-                while (grid[x][y] != ' ') {
-                    x = random.nextInt(gridWidth)
-                    y = random.nextInt(gridHeight)
-                }
-
-                val symbol = distractors[random.nextInt(distractors.size)]
-                grid[x][y] = symbol
-
-                val coordinates = randomizeCoordinatesWithinBounds(x * cellSize, y * cellSize, cellSize)
-
-                drawString(
-                    symbol.toString(),
-                    coordinates.first,
-                    coordinates.second
-                )
-            }
+            drawSymbols(grid = table, coloredA = coloredA)
         }
     }
 
+    return when {
+        frame -> frameImage(gridWidth, cellSize, gridHeight, image)
+        else -> image
+    }
+}
+
+private fun fillSymbolTable(gridWidth: Int, gridHeight: Int, cellSize: Int): Array<Array<Pair<Char, Coordinates>>> {
+    val symbolTable = Array(gridWidth) { Array(gridHeight) { ' ' to Coordinates(0, 0) } }
+
+    (0 until 30).forEach {
+        var x = random.nextInt(gridWidth / 2 - 1)
+        var y = random.nextInt(gridHeight / 2)
+
+        while (symbolTable[x][y].first == 'A' ||
+            (x > 0 && symbolTable[x - 1][y].first == 'A') ||
+            (x < gridWidth / 2 - 1 && symbolTable[x + 1][y].first == 'A') ||
+            (y > 0 && symbolTable[x][y - 1].first == 'A') ||
+            (y < gridHeight - 1 && symbolTable[x][y + 1].first == 'A') ||
+            (x > 0 && y > 0 && symbolTable[x - 1][y - 1].first == 'A') ||
+            (x > 0 && y < gridHeight - 1 && symbolTable[x - 1][y + 1].first == 'A') ||
+            (x < gridWidth / 2 - 1 && y > 0 && symbolTable[x + 1][y - 1].first == 'A') ||
+            (x < gridWidth / 2 - 1 && y < gridHeight - 1 && symbolTable[x + 1][y + 1].first == 'A')
+        ) {
+            x = random.nextInt(gridWidth / 2 - 1)
+            y = random.nextInt(gridHeight)
+        }
+
+        val coordinates = randomizeCoordinatesWithinBounds(x * cellSize, y * cellSize, cellSize)
+        symbolTable[x][y] = 'A' to Coordinates(coordinates.first, coordinates.second)
+        symbolTable[(gridWidth - 1) - x][y] = 'A' to Coordinates(
+            x = ((gridWidth - 1) - x) * cellSize + (cellSize - (coordinates.first - x * cellSize) - 6),
+            y = coordinates.second
+        )
+    }
+
+    (1..314).forEach {
+        var x = random.nextInt(gridWidth)
+        var y = random.nextInt(gridHeight)
+
+        while (symbolTable[x][y].first != ' ') {
+            x = random.nextInt(gridWidth)
+            y = random.nextInt(gridHeight)
+        }
+
+        val symbol = distractors[random.nextInt(distractors.size)]
+        val coordinates = randomizeCoordinatesWithinBounds(x * cellSize, y * cellSize, cellSize)
+        symbolTable[x][y] = symbol to Coordinates(coordinates.first, coordinates.second)
+    }
+
+    return symbolTable
+}
+
+private fun Graphics2D.drawSymbols(
+    grid: Array<Array<Pair<Char, Coordinates>>>,
+    coloredA: Boolean = false
+) {
+    font = Font("Arial", Font.PLAIN, cmsToPixel(0.24, DPI.toDouble()).toInt())
+
+    grid.toList().map { it.toList() }.flatMap { it }
+        .forEach {
+            val (symbol, coordinates) = it
+
+            when (symbol) {
+                'A' -> {
+                    if (coloredA) {
+                        color = Color.RED
+                    }
+                    drawString(symbol.toString(), coordinates.x, coordinates.y)
+                }
+                else -> {
+                    color = Color.BLACK
+                    drawString(symbol.toString(), coordinates.x, coordinates.y)
+                }
+            }
+        }
+
+}
+
+private fun Graphics2D.drawGrid(
+    bufferedImage: BufferedImage,
+    cellSize: Int
+) {
+    stroke = BasicStroke(1.0f)
+    color = Color.BLACK
+
+    (0 until bufferedImage.width step cellSize).forEach {
+        drawLine(it, 0, it, bufferedImage.height)
+    }
+
+    (0 until bufferedImage.height step cellSize).forEach {
+        drawLine(0, it, bufferedImage.width, it)
+    }
+}
+
+private fun frameImage(
+    gridWidth: Int,
+    cellSize: Int,
+    gridHeight: Int,
+    image: BufferedImage
+): BufferedImage {
     val imageInFrame = BufferedImage((gridWidth + 1) * cellSize + 1, (gridHeight + 1) * cellSize + 1, TYPE_INT_RGB)
         .apply {
             with(graphics) {
@@ -113,10 +164,9 @@ fun generate(gridWidth: Int, gridHeight: Int, cellSize: Int): BufferedImage {
                 drawLine(0, (gridHeight + 1) * cellSize, cellSize * (gridWidth + 1), cellSize * (gridHeight + 1))
                 drawLine(0, 0, 0, cellSize * (gridHeight + 1))
 
-                graphics.drawImage(image, cellSize/2, cellSize/2, null)
+                graphics.drawImage(image, cellSize / 2, cellSize / 2, null)
             }
         }
-
     return imageInFrame
 }
 
@@ -141,14 +191,7 @@ private fun randomizeCoordinatesWithinBounds(x: Int, y: Int, cellSize: Int): Pai
 
 private val distractors = ('B'..'Z').toList()
 
-
-//            var counter = 1
-//            (0..height step cellSize).forEach {
-//                val currentY = it
-//                (0..width - cellSize step cellSize).forEach {
-//                    val currentX = it
-////                    val coords = randomizeCoordinatesWithinBounds(currentX, currentY, cel)
-//                    drawString(counter.toString(), currentX + cellSize/4, currentY + cellSize/2)
-//                    counter++
-//                }
-//            }
+private data class Coordinates(
+    val x: Int,
+    val y: Int
+)
