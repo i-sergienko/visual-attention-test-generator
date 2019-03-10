@@ -11,19 +11,7 @@ import java.util.*
 
 val random = Random()
 
-fun generate(gridWidth: Int, gridHeight: Int, cellSize: Int): BufferedImage {
-    val symbolTable = fillSymbolTable(gridWidth, gridHeight, cellSize)
-
-    return symbolTable.toImage(
-        gridWidth = gridWidth,
-        gridHeight = gridHeight,
-        cellSize = cellSize,
-        drawGrid = true,
-        coloredA = true
-    )
-}
-
-private fun Array<Array<Pair<Char, Coordinates>>>.toImage(
+fun Array<Array<Pair<Char, Coordinates>>>.toImage(
     gridWidth: Int,
     gridHeight: Int,
     cellSize: Int,
@@ -53,7 +41,7 @@ private fun Array<Array<Pair<Char, Coordinates>>>.toImage(
     }
 }
 
-private fun fillSymbolTable(gridWidth: Int, gridHeight: Int, cellSize: Int): Array<Array<Pair<Char, Coordinates>>> {
+fun fillSymbolTable(gridWidth: Int, gridHeight: Int, cellSize: Int): Array<Array<Pair<Char, Coordinates>>> {
     val symbolTable = Array(gridWidth) { Array(gridHeight) { ' ' to Coordinates(0, 0) } }
 
     (0 until 30).forEach {
@@ -77,7 +65,7 @@ private fun fillSymbolTable(gridWidth: Int, gridHeight: Int, cellSize: Int): Arr
         val coordinates = randomizeCoordinatesWithinBounds(x * cellSize, y * cellSize, cellSize)
         symbolTable[x][y] = 'A' to Coordinates(coordinates.first, coordinates.second)
         symbolTable[(gridWidth - 1) - x][y] = 'A' to Coordinates(
-            x = ((gridWidth - 1) - x) * cellSize + (cellSize - (coordinates.first - x * cellSize) - 6),
+            x = ((gridWidth - 1) - x) * cellSize + (cellSize - (coordinates.first - x * cellSize) - 20),
             y = coordinates.second
         )
     }
@@ -191,7 +179,7 @@ private fun randomizeCoordinatesWithinBounds(x: Int, y: Int, cellSize: Int): Pai
 
 private val distractors = ('B'..'Z').toList()
 
-private data class Coordinates(
+data class Coordinates(
     val x: Int,
     val y: Int
 )
