@@ -42,19 +42,23 @@ fun main(args: Array<String>) {
         path = "${directory.toAbsolutePath()}/print.pdf"
     )
     imageNotColored.save("${directory.toAbsolutePath()}/noColor.jpg")
+
+    println("Generated images in directory: ${directory.toAbsolutePath()}")
 }
 
 private fun generateSubdirectory(): Path {
     val name = (0..6).map { symbols[random.nextInt(symbols.size)] }.joinToString(separator = "")
 
-    val newDir = File("./$name")
-    newDir.mkdir()
+    val newDir = File(name)
+    val created = newDir.mkdir()
+    println("Created directory ${newDir.toPath().toAbsolutePath()}: $created")
 
     return newDir.toPath()
 }
 
 private fun BufferedImage.save(path: String) {
-    ImageIO.write(this, "jpg", File(path))
+    val saved = ImageIO.write(this, "jpg", File(path))
+    println("Saved image $path: $saved")
 }
 
 private val random = Random()
