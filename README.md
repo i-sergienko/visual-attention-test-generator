@@ -35,3 +35,7 @@ Authors:
 
 * Версия с символами "А" выделенными красным, и с сеткой - для проверяющего.
 ![Colored version](https://raw.githubusercontent.com/i-sergienko/visual-attention-test-generator/main/example/colored.jpg)  
+  
+Авторы:
+* Имплементация: Иван Сергиенко
+* Техническое задание: Алексей Сергиенко
